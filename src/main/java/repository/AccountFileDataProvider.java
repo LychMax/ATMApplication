@@ -10,11 +10,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccountFileManager {
+public class AccountFileDataProvider {
 
     private final String fileName;
 
-    public AccountFileManager(String fileName) {
+    public AccountFileDataProvider(String fileName) {
         this.fileName = fileName;
     }
 
@@ -48,5 +48,26 @@ public class AccountFileManager {
         } catch (Exception ex) {
             System.out.print("Error loading accounts: " + ex.getMessage());
         }
+    }
+
+    public Account findAccountByCardNumber(String cardNumberToFind) {
+        List<Account> accounts = getAccounts();
+        for (Account account : accounts) {
+            if (account.getCardNumber().equals(cardNumberToFind)) {
+                return account;
+            }
+        }
+        return null;
+    }
+
+    public Account checkAccountPinCode(String cardNumberToCheck, String pinCodeToCheck) {
+        List<Account> accounts = getAccounts();
+        for (Account account : accounts) {
+            if (account.getPinCode().equals(pinCodeToCheck)
+                    && account.getCardNumber().equals(cardNumberToCheck)) {
+                return account;
+            }
+        }
+        return null;
     }
 }

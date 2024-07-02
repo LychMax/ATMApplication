@@ -3,11 +3,11 @@ package src.main.java.repository;
 import java.io.*;
 import java.math.BigDecimal;
 
-public class ATMBalanceManager {
+public class ATMDataFileProvider {
 
     private final String fileName;
 
-    public ATMBalanceManager(String fileName) {
+    public ATMDataFileProvider(String fileName) {
         this.fileName = fileName;
     }
 

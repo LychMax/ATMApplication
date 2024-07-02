@@ -10,19 +10,37 @@ public class ATMHandler {
         this.bankAccountHandler = bankAccountHandler;
     }
 
-    public void readCardNumber() {
-
+    public void checkCard() {
         try (Scanner scanner = new Scanner(System.in)) {
             String cardNumber = scanner.nextLine();
 
+            boolean cardFound;
+
             if (isValidFormat(cardNumber)) {
-                bankAccountHandler.cardCheck(cardNumber);
-            }else{
-                System.out.println("Invalid card format. ");
+                cardFound = bankAccountHandler.cardCheck(cardNumber);
+            } else {
+                System.out.println("Invalid card number");
+                return;
+            }
+
+            if (cardFound) {
+                System.out.println("Card number found");
+
+                String pinCode = scanner.nextLine();
+
+                boolean pinValidated = bankAccountHandler.pinCheck(cardNumber, pinCode);
+                if (pinValidated) {
+                    System.out.println("PIN check successful.");
+                } else {
+                    System.out.println("Invalid PIN or error checking PIN.");
+                }
+
+            } else {
+                System.out.println("Card number not found");
             }
 
         } catch (Exception ex) {
-
+            System.out.println("Error");
         }
     }
 
