@@ -1,4 +1,4 @@
-package src.main.java.repository;
+package src.main.java.models;
 
 import java.math.BigDecimal;
 
@@ -7,12 +7,14 @@ public class Account {
     private String pinCode;
     private BigDecimal balance;
     private long blockUntill;
+    private BigDecimal cardLimit;
 
-    public Account(String cardNumber, BigDecimal balance, String pinCode, long blockUntill) {
+    public Account(String cardNumber, String pinCode, BigDecimal balance, long blockUntill, BigDecimal cardLimit) {
         this.cardNumber = cardNumber;
-        this.balance = balance;
         this.pinCode = pinCode;
+        this.balance = balance;
         this.blockUntill = blockUntill;
+        this.cardLimit = cardLimit;
     }
 
     public String getCardNumber() {
@@ -45,5 +47,13 @@ public class Account {
 
     public void setBlockUntill(long blockUntill) {
         this.blockUntill = blockUntill;
+    }
+
+    public BigDecimal getLimit() {
+        return cardLimit;
+    }
+
+    public void setLimit(BigDecimal limit) {
+        this.cardLimit = limit;
     }
 }
