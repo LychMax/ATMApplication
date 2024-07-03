@@ -6,14 +6,14 @@ public class Account {
     private String cardNumber;
     private String pinCode;
     private BigDecimal balance;
-    private long blockUntill;
+    private long blockUntil;
     private BigDecimal cardLimit;
 
-    public Account(String cardNumber, String pinCode, BigDecimal balance, long blockUntill, BigDecimal cardLimit) {
+    public Account(String cardNumber, String pinCode, BigDecimal balance, long blockUntil, BigDecimal cardLimit) {
         this.cardNumber = cardNumber;
         this.pinCode = pinCode;
         this.balance = balance;
-        this.blockUntill = blockUntill;
+        this.blockUntil = blockUntil;
         this.cardLimit = cardLimit;
     }
 
@@ -41,12 +41,12 @@ public class Account {
         this.balance = balance;
     }
 
-    public long getBlockUntill() {
-        return blockUntill;
+    public long getBlockUntil() {
+        return blockUntil;
     }
 
-    public void setBlockUntill(long blockUntill) {
-        this.blockUntill = blockUntill;
+    public void setBlockUntil(long blockUntil) {
+        this.blockUntil = blockUntil;
     }
 
     public BigDecimal getLimit() {
