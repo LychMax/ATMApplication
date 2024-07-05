@@ -65,7 +65,7 @@ public class ATMHandler {
         String regex = "\\d{4}-\\d{4}-\\d{4}-\\d{4}";
 
         return cardNumber.matches(regex);
-        }
+    }
 
     public BigDecimal getCardBalance() {
 

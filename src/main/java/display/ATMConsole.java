@@ -63,7 +63,6 @@ public class ATMConsole {
                 }
             }
 
-
             int choice;
             do {
                 System.out.println("1. Check balance");
@@ -81,15 +80,55 @@ public class ATMConsole {
                         break;
                     case 2:
                         System.out.println("Enter amount to withdraw: ");
-                        BigDecimal withdrawAmount = scanner.nextBigDecimal();
+                        BigDecimal withdrawAmount;
+                        try {
+                            withdrawAmount = new BigDecimal(scanner.next());
+                            atmHandler.withdrawFromCardBalance(withdrawAmount);
+                            System.out.println("Withdraw successfully");
+                        } catch (NumberFormatException ex) {
+                            System.out.println("The entered value does not match the required value. ");
+                            System.out.println("Select action: ");
+                            System.out.println("1. Back to main menu. ");
+                            System.out.println("2. Exit. ");
 
-                        atmHandler.withdrawFromCardBalance(withdrawAmount);
+                            choice = scanner.nextInt();
+
+                            switch (choice) {
+                                case 1:
+                                    break;
+                                case 2:
+                                    startATM();
+                            }
+                        } catch (InsufficientFundsOnATMException ex) {
+                            System.out.println("Error: Insufficient funds on ATM.");
+                        } catch (InsufficientFundsOnAccountException ex) {
+                            System.out.println("Error: Insufficient funds on account.");
+                        }
                         break;
                     case 3:
                         System.out.println("Enter amount to deposit: ");
-                        BigDecimal depositAmount = scanner.nextBigDecimal();
+                        BigDecimal depositAmount;
+                        try {
+                            depositAmount = new BigDecimal(scanner.next());
+                            atmHandler.depositToCardBalance(depositAmount);
+                            System.out.println("Deposit successfully");
+                        } catch (NumberFormatException ex) {
+                            System.out.println("The entered value does not match the required value. ");
+                            System.out.println("Select action: ");
+                            System.out.println("1. Back to main menu. ");
+                            System.out.println("2. Exit. ");
 
-                        atmHandler.depositToCardBalance(depositAmount);
+                            choice = scanner.nextInt();
+
+                            switch (choice) {
+                                case 1:
+                                    break;
+                                case 2:
+                                    startATM();
+                            }
+                        } catch (AccountLimitExceededException ex) {
+                            System.out.println("Error: Account limit exceeded.");
+                        }
                         break;
                     case 4:
                         System.out.println("Exiting... Thank you for using our ATM.");
@@ -100,19 +139,9 @@ public class ATMConsole {
                 }
             } while (choice != 4);
 
-        } catch (InputMismatchException ex) {
-            System.out.println("sd");
-        } catch (InsufficientFundsOnATMException ex) {
-            System.out.println("Error: Insufficient funds on ATM.");
-        } catch (InsufficientFundsOnAccountException ex) {
-            System.out.println("Error: Insufficient funds on account.");
-        } catch (AccountLimitExceededException ex) {
-            System.out.println("Error: Account limit exceeded.");
         } catch (Exception ex) {
             System.out.println("Something went wrong");
             startATM();
         }
     }
 }
-
-

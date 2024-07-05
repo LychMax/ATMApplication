@@ -28,14 +28,9 @@ public class AccountDataProvider {
                 }
                 String cardNumber = splitLine[0];
                 String pinCode = splitLine[1];
-
-                String balanceStr = splitLine[2];
-                BigDecimal balance = new BigDecimal(balanceStr);
-
+                BigDecimal balance = new BigDecimal(splitLine[2]);
                 long blockUntil = Long.parseLong(splitLine[3]);
-
-                String cardLimitStr = splitLine[4];
-                BigDecimal cardLimit = new BigDecimal(cardLimitStr);
+                BigDecimal cardLimit = new BigDecimal(splitLine[4]);
 
                 accounts.add(new Account(cardNumber, pinCode, balance, blockUntil, cardLimit));
             }

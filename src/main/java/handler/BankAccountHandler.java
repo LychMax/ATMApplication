@@ -6,7 +6,6 @@ import src.main.java.repository.AccountDataProvider;
 import java.math.BigDecimal;
 import java.util.List;
 
-
 public class BankAccountHandler {
 
     AccountDataProvider accountDataProvider;
