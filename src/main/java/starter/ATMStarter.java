@@ -8,13 +8,12 @@ public class ATMStarter {
 
     public static void startATMWithConsoleInterface() {
 
-        ProviderStarter providerStarter =  new ProviderStarter();
+        ProviderStarter providerStarter = new ProviderStarter();
 
-        ATMConsole atmConsole = new ATMConsole(null);
         BankAccountHandler bankAccountHandler = new BankAccountHandler(providerStarter.accountDataProvider);
+        ATMHandler atmHandler = new ATMHandler(bankAccountHandler, providerStarter.atmDataProvider);
 
-        ATMHandler atmHandler = new ATMHandler(bankAccountHandler, atmConsole, providerStarter.atmDataProvider);
-        atmConsole = new ATMConsole(atmHandler);
+        ATMConsole atmConsole = new ATMConsole(atmHandler);
 
         atmConsole.startATM();
     }

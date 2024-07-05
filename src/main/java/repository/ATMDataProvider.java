@@ -1,7 +1,8 @@
 package src.main.java.repository;
 
+import src.main.java.exception.FaildSaveFileException;
+import src.main.java.exception.InvalidReadingFileException;
 import src.main.java.model.ATM;
-import src.main.java.model.Account;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -22,31 +23,28 @@ public class ATMDataProvider {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] splitLine = line.split("\\s+");
-                if (splitLine.length >= 1) {
-                    BigDecimal atmBalance;
-                    try {
-                        String atmBalanceStr = splitLine[2];
-                        atmBalance = new BigDecimal(atmBalanceStr);
-                    } catch (NumberFormatException e) {
-                        continue;
-                    }
-                    atm.add(new ATM(atmBalance));
+                if (splitLine.length != 1) {
+                    throw new InvalidReadingFileException("Invalid reading file: " + fileName);
                 }
+                String atmBalanceStr = splitLine[0];
+                BigDecimal atmBalance = new BigDecimal(atmBalanceStr);
+
+                atm.add(new ATM(atmBalance));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (InvalidReadingFileException | IOException ex) {
+            throw new InvalidReadingFileException("Invalid reading file: " + fileName);
         }
         return atm;
     }
 
-    public void saveBalance(List<ATM> atms) {
+    public void saveATM(List<ATM> atms) {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName))) {
             for (ATM atm : atms) {
                 bufferedWriter.write(String.format("%s\n",
                         atm.getAtmBalance()));
             }
-        } catch (Exception ex) {
-            System.out.print("Error loading ATM: " + ex.getMessage());
+        } catch (FaildSaveFileException | IOException ex) {
+            System.out.print("Error saving accounts " + fileName);
         }
     }
 }

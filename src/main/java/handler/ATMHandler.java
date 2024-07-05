@@ -1,6 +1,5 @@
 package src.main.java.handler;
 
-import src.main.java.display.ATMConsole;
 import src.main.java.exception.*;
 import src.main.java.model.ATM;
 import src.main.java.repository.ATMDataProvider;
@@ -15,7 +14,7 @@ public class ATMHandler {
     ATMDataProvider atmDataProvider;
     int attempts = 0;
 
-    public ATMHandler(BankAccountHandler bankAccountHandler, ATMConsole atmConsole,
+    public ATMHandler(BankAccountHandler bankAccountHandler,
                       ATMDataProvider atmDataProvider) {
         this.bankAccountHandler = bankAccountHandler;
         this.atmDataProvider = atmDataProvider;
@@ -54,7 +53,7 @@ public class ATMHandler {
 
                 throw new PinAttemptsExceededException("Limit of attempts exceeded. Your account is blocked for a day.");
             } else {
-                throw new InvalidPinException("Invalid pin. ");
+                throw new InvalidPinException("Attempts remained: " + (3 - attempts));
             }
         }
         return pinValidated;
@@ -66,11 +65,11 @@ public class ATMHandler {
         String regex = "\\d{4}-\\d{4}-\\d{4}-\\d{4}";
 
         return cardNumber.matches(regex);
-    }
+        }
 
-    public void getCardBalance() {
-        BigDecimal balance = bankAccountHandler.getCardBalance(cardNumber);
-//        atmConsole.sendMessageToScreen("Your balance is: " + balance);
+    public BigDecimal getCardBalance() {
+
+        return bankAccountHandler.getCardBalance(cardNumber);
     }
 
     public BigDecimal getATMBalance() {
@@ -86,6 +85,7 @@ public class ATMHandler {
         List<ATM> atms = atmDataProvider.getATM();
         for (ATM atm : atms) {
             atm.setAtmBalance(newATMBalance);
+            atmDataProvider.saveATM(atms);
         }
     }
 
@@ -93,11 +93,10 @@ public class ATMHandler {
 
         BigDecimal accountBalance = bankAccountHandler.getCardBalance(cardNumber);
 
-
         if (withdrawAmount.compareTo(getATMBalance()) > 0) {
-            throw new InsufficientFundsException("ATM has insufficient funds.");
+            throw new InsufficientFundsOnATMException("ATM has insufficient funds.");
         } else if (withdrawAmount.compareTo(accountBalance) > 0) {
-            throw new InsufficientFundsException("Insufficient funds in your account.");
+            throw new InsufficientFundsOnAccountException("Insufficient funds in your account.");
         } else {
             BigDecimal newAccountBalance = accountBalance.subtract(withdrawAmount);
             BigDecimal newATMBalance = getATMBalance().subtract(withdrawAmount);
@@ -113,7 +112,7 @@ public class ATMHandler {
         BigDecimal cardLimit = bankAccountHandler.getCardLimit(cardNumber);
 
         if (depositAmount.compareTo(cardLimit) > 0) {
-            throw new ATMLimitExceededException("Deposit amount exceeds card replenishment limit.");
+            throw new AccountLimitExceededException("Deposit amount exceeds card replenishment limit.");
         } else {
 
             BigDecimal accountBalance = bankAccountHandler.getCardBalance(cardNumber);

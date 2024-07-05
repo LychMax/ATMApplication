@@ -16,18 +16,18 @@ public class ATMConsole {
 
     public void startATM() {
 
-        try (Scanner scanner = new Scanner(System.in)) {
-            boolean validCard = false;
-            boolean validPassword = false;
+        boolean isValidCard = false;
+        boolean isValidPassword = false;
 
-            while (!validCard) {
+        try (Scanner scanner = new Scanner(System.in)) {
+            while (!isValidCard) {
                 try {
                     System.out.println("Enter card number");
                     String cardNumber = scanner.nextLine();
 
                     if (atmHandler.checkCardNumber(cardNumber)) {
                         System.out.println("You have entered a valid card number");
-                        validCard = true;
+                        isValidCard = true;
                     }
 
                 } catch (CheckCardNumberException ex) {
@@ -37,23 +37,24 @@ public class ATMConsole {
                 } catch (CardNotFoundException ex) {
                     System.out.println("Error: Card number not found.");
                 } catch (AccountBlockedException ex) {
-                    System.out.println("Error: Account blocked.");
+                    System.out.println("Account blocked.");
                 } catch (Exception ex) {
                     System.out.println("Something went wrong");
                 }
             }
 
-            while (!validPassword) {
+            while (!isValidPassword) {
                 try {
                     System.out.println("Enter pin code: ");
                     String pinCode = scanner.nextLine();
 
                     if (atmHandler.checkCardPassword(pinCode)) {
                         System.out.println("You have entered a valid pin code");
-                        validPassword = true;
+                        isValidPassword = true;
                     }
                 } catch (InvalidPinException ex) {
-                    System.out.println("Error: Invalid PIN.  ");
+                    System.out.println("Error: Invalid PIN. " + ex.getMessage());
+
                 } catch (PinAttemptsExceededException ex) {
                     System.out.println("Error: Password entry attempts exceeded. The account was blocked for a day. ");
                     startATM();
@@ -61,6 +62,7 @@ public class ATMConsole {
                     System.out.println("Error: Something went wrong: ");
                 }
             }
+
 
             int choice;
             do {
@@ -74,34 +76,43 @@ public class ATMConsole {
 
                 switch (choice) {
                     case 1:
-                        atmHandler.getCardBalance();
+                        BigDecimal cardBalance = atmHandler.getCardBalance();
+                        System.out.println("Card balance: " + cardBalance);
                         break;
                     case 2:
                         System.out.println("Enter amount to withdraw: ");
                         BigDecimal withdrawAmount = scanner.nextBigDecimal();
+
                         atmHandler.withdrawFromCardBalance(withdrawAmount);
                         break;
                     case 3:
                         System.out.println("Enter amount to deposit: ");
                         BigDecimal depositAmount = scanner.nextBigDecimal();
+
                         atmHandler.depositToCardBalance(depositAmount);
                         break;
                     case 4:
                         System.out.println("Exiting... Thank you for using our ATM.");
+                        startATM();
                         break;
                     default:
                         System.out.println("Invalid option. Please try again.");
                 }
             } while (choice != 4);
 
-        } catch (InsufficientFundsException e) {
-            System.out.println("Error: Insufficient funds.");
-        } catch (ATMLimitExceededException e) {
-            System.out.println("Error: " + e.getMessage());
-        } catch (Exception e) {
-            System.out.println("Unexpected error: " + e.getMessage());
+        } catch (InputMismatchException ex) {
+            System.out.println("sd");
+        } catch (InsufficientFundsOnATMException ex) {
+            System.out.println("Error: Insufficient funds on ATM.");
+        } catch (InsufficientFundsOnAccountException ex) {
+            System.out.println("Error: Insufficient funds on account.");
+        } catch (AccountLimitExceededException ex) {
+            System.out.println("Error: Account limit exceeded.");
+        } catch (Exception ex) {
+            System.out.println("Something went wrong");
+            startATM();
         }
     }
-
 }
+
 

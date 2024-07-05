@@ -1,5 +1,7 @@
 package src.main.java.repository;
 
+import src.main.java.exception.FaildSaveFileException;
+import src.main.java.exception.InvalidReadingFileException;
 import src.main.java.model.Account;
 
 import java.io.*;
@@ -21,35 +23,24 @@ public class AccountDataProvider {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 String[] splitLine = line.split("\\s+");
-                if (splitLine.length >= 5) {
-                    String cardNumber = splitLine[0];
-                    String pinCode = splitLine[1];
-                    BigDecimal balance;
-                    try {
-                        String balanceStr = splitLine[2];
-                        balance = new BigDecimal(balanceStr);
-                    } catch (NumberFormatException e) {
-                        continue;
-                    }
-                    long blockUntil;
-                    try {
-                        blockUntil = Long.parseLong(splitLine[3]);
-                    } catch (NumberFormatException e) {
-                        continue;
-                    }
-                    BigDecimal cardLimit;
-                    try {
-                        String cardLimitStr = splitLine[4];
-                        cardLimit = new BigDecimal(cardLimitStr);
-                    } catch (NumberFormatException e) {
-                        continue;
-                    }
-
-                    accounts.add(new Account(cardNumber, pinCode, balance, blockUntil, cardLimit));
+                if (splitLine.length != 5) {
+                    throw new InvalidReadingFileException(fileName);
                 }
+                String cardNumber = splitLine[0];
+                String pinCode = splitLine[1];
+
+                String balanceStr = splitLine[2];
+                BigDecimal balance = new BigDecimal(balanceStr);
+
+                long blockUntil = Long.parseLong(splitLine[3]);
+
+                String cardLimitStr = splitLine[4];
+                BigDecimal cardLimit = new BigDecimal(cardLimitStr);
+
+                accounts.add(new Account(cardNumber, pinCode, balance, blockUntil, cardLimit));
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (InvalidReadingFileException | IOException ex) {
+            throw new InvalidReadingFileException("Invalid reading file: " + fileName);
         }
         return accounts;
     }
@@ -63,8 +54,8 @@ public class AccountDataProvider {
                         account.getBalance().stripTrailingZeros().toPlainString(),
                         account.getBlockUntil(), account.getLimit().stripTrailingZeros().toPlainString()));
             }
-        } catch (Exception ex) {
-            System.out.print("Error loading accounts: " + ex.getMessage());
+        } catch (FaildSaveFileException | IOException ex) {
+            System.out.print("Error saving accounts " + fileName);
         }
     }
 }
