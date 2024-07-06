@@ -1,18 +1,18 @@
 package src.main.java.handler;
 
 import src.main.java.exception.*;
-import src.main.java.model.ATM;
-import src.main.java.repository.ATMDataProvider;
+import src.main.java.model.ATMData;
+import src.main.java.provider.ATMDataProvider;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public class ATMHandler {
 
-    BankAccountHandler bankAccountHandler;
+    private final BankAccountHandler bankAccountHandler;
+    private final ATMDataProvider atmDataProvider;
+
     private String cardNumber;
-    ATMDataProvider atmDataProvider;
-    int attempts = 0;
+    private int attempts = 0;
 
     public ATMHandler(BankAccountHandler bankAccountHandler,
                       ATMDataProvider atmDataProvider) {
@@ -20,86 +20,53 @@ public class ATMHandler {
         this.atmDataProvider = atmDataProvider;
     }
 
-    public boolean checkCardNumber(String cardNumber) {
-        boolean cardFoundStatus;
-
-        try {
-            if (isValidFormat(cardNumber)) {
-                cardFoundStatus = bankAccountHandler.checkCardExistence(cardNumber);
-                if (cardFoundStatus) {
-                    if (bankAccountHandler.checkAccountBlocked(cardNumber)) {
-                        throw new AccountBlockedException("Account blocked");
-                    }
-                    this.cardNumber = cardNumber;
-                } else {
-                    throw new CardNotFoundException("Card not found");
-                }
-            } else {
-                throw new InvalidCardNumberException("Invalid card number");
-            }
-        } catch (CheckCardNumberException ex) {
-            throw new CheckCardNumberException("Something went wrong");
+    public void checkCardNumber(String cardNumber) {
+        if (!isValidFormat(cardNumber)) {
+            throw new InvalidCardNumberException("Invalid card number");
         }
-        return cardFoundStatus;
+
+        if (!bankAccountHandler.isCardExist(cardNumber)) {
+            throw new CardNotFoundException("Card not found");
+        }
+
+        if (bankAccountHandler.isAccountBlocked(cardNumber)) {
+            throw new AccountBlockedException("Account blocked");
+        }
+
+        this.cardNumber = cardNumber;
+        this.attempts = 0;
     }
 
-
-    public boolean checkCardPassword(String cardPinCode) {
-        boolean pinValidated = bankAccountHandler.checkCardPinCode(cardPinCode);
-        if (!pinValidated) {
-            attempts++;
-            if (attempts >= 3) {
-                bankAccountHandler.blockAccount(cardNumber);
-
-                throw new PinAttemptsExceededException("Limit of attempts exceeded. Your account is blocked for a day.");
-            } else {
-                throw new InvalidPinException("Attempts remained: " + (3 - attempts));
-            }
+    public void checkCardPinCode(String cardPinCode) {
+        if (bankAccountHandler.checkCardPinCode(cardNumber, cardPinCode)) {
+            return;
         }
-        return pinValidated;
-    }
 
+        attempts++;
+        if (attempts >= 3) {
+            bankAccountHandler.blockAccount(cardNumber);
+            throw new PinAttemptsExceededException("Limit of attempts exceeded. Your account is blocked for a day.");
+        }
 
-    public static boolean isValidFormat(String cardNumber) {
-
-        String regex = "\\d{4}-\\d{4}-\\d{4}-\\d{4}";
-
-        return cardNumber.matches(regex);
+        throw new InvalidPinException("Invalid pin");
     }
 
     public BigDecimal getCardBalance() {
-
         return bankAccountHandler.getCardBalance(cardNumber);
-    }
-
-    public BigDecimal getATMBalance() {
-        List<ATM> atms = atmDataProvider.getATM();
-        for (ATM atm : atms) {
-            BigDecimal atmBalance = atm.getAtmBalance();
-            return atmBalance;
-        }
-        return null;
-    }
-
-    public void setATMBalance(BigDecimal newATMBalance) {
-        List<ATM> atms = atmDataProvider.getATM();
-        for (ATM atm : atms) {
-            atm.setAtmBalance(newATMBalance);
-            atmDataProvider.saveATM(atms);
-        }
     }
 
     public void withdrawFromCardBalance(BigDecimal withdrawAmount) {
 
         BigDecimal accountBalance = bankAccountHandler.getCardBalance(cardNumber);
+        BigDecimal atmBalance = getATMBalance();
 
-        if (withdrawAmount.compareTo(getATMBalance()) > 0) {
-            throw new InsufficientFundsOnATMException("ATM has insufficient funds.");
+        if (withdrawAmount.compareTo(atmBalance) > 0) {
+            throw new InsufficientFundsOnATMException("ATMData has insufficient funds.");
         } else if (withdrawAmount.compareTo(accountBalance) > 0) {
             throw new InsufficientFundsOnAccountException("Insufficient funds in your account.");
         } else {
             BigDecimal newAccountBalance = accountBalance.subtract(withdrawAmount);
-            BigDecimal newATMBalance = getATMBalance().subtract(withdrawAmount);
+            BigDecimal newATMBalance = atmBalance.subtract(withdrawAmount);
 
             bankAccountHandler.updateCardBalance(cardNumber, newAccountBalance);
 
@@ -107,7 +74,7 @@ public class ATMHandler {
         }
     }
 
-    public void depositToCardBalance(BigDecimal depositAmount) {
+    public void creditToCardBalance(BigDecimal depositAmount) {
 
         BigDecimal cardLimit = bankAccountHandler.getCardLimit(cardNumber);
 
@@ -124,5 +91,26 @@ public class ATMHandler {
 
             setATMBalance(newATMBalance);
         }
+    }
+
+    private void setATMBalance(BigDecimal newATMBalance) {
+        ATMData atmData = atmDataProvider.getATMData();
+        atmData.setBalance(newATMBalance);
+        atmDataProvider.updateATMData(atmData);
+    }
+
+    private BigDecimal getATMBalance() {
+        ATMData atmData = atmDataProvider.getATMData();
+        if (atmData == null) {
+            throw new ATMDataNotFoundException();
+        }
+        return atmData.getBalance();
+    }
+
+    private boolean isValidFormat(String cardNumber) {
+
+        String regex = "\\d{4}-\\d{4}-\\d{4}-\\d{4}";
+
+        return cardNumber.matches(regex);
     }
 }

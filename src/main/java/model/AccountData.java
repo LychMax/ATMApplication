@@ -2,19 +2,20 @@ package src.main.java.model;
 
 import java.math.BigDecimal;
 
-public class Account {
+public class AccountData {
     private String cardNumber;
     private String pinCode;
     private BigDecimal balance;
-    private long blockUntil;
-    private BigDecimal cardLimit;
+    private long blockedUntil;
+    private BigDecimal creditLimit;
 
-    public Account(String cardNumber, String pinCode, BigDecimal balance, long blockUntil, BigDecimal cardLimit) {
+    public AccountData(final String cardNumber, final String pinCode,
+                       final BigDecimal balance, final long blockedUntil, BigDecimal creditLimit) {
         this.cardNumber = cardNumber;
         this.pinCode = pinCode;
         this.balance = balance;
-        this.blockUntil = blockUntil;
-        this.cardLimit = cardLimit;
+        this.blockedUntil = blockedUntil;
+        this.creditLimit = creditLimit;
     }
 
     public String getCardNumber() {
@@ -41,19 +42,19 @@ public class Account {
         this.balance = balance;
     }
 
-    public long getBlockUntil() {
-        return blockUntil;
+    public long getBlockedUntil() {
+        return blockedUntil;
     }
 
-    public void setBlockUntil(long blockUntil) {
-        this.blockUntil = blockUntil;
+    public void setBlockedUntil(long blockedUntil) {
+        this.blockedUntil = blockedUntil;
     }
 
-    public BigDecimal getLimit() {
-        return cardLimit;
+    public BigDecimal getCreditLimit() {
+        return creditLimit;
     }
 
-    public void setLimit(BigDecimal limit) {
-        this.cardLimit = limit;
+    public void setCreditLimit(BigDecimal limit) {
+        this.creditLimit = limit;
     }
 }

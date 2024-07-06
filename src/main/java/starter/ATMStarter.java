@@ -5,13 +5,9 @@ import src.main.java.handler.ATMHandler;
 import src.main.java.handler.BankAccountHandler;
 
 public class ATMStarter {
-
     public static void startATMWithConsoleInterface() {
-
-        ProviderStarter providerStarter = new ProviderStarter();
-
-        BankAccountHandler bankAccountHandler = new BankAccountHandler(providerStarter.accountDataProvider);
-        ATMHandler atmHandler = new ATMHandler(bankAccountHandler, providerStarter.atmDataProvider);
+        BankAccountHandler bankAccountHandler = new BankAccountHandler(ProviderStarter.initAccountDataProvider());
+        ATMHandler atmHandler = new ATMHandler(bankAccountHandler, ProviderStarter.initATMDataProvider());
 
         ATMConsole atmConsole = new ATMConsole(atmHandler);
 
