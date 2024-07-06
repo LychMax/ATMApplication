@@ -123,10 +123,10 @@ public class ATMConsole {
             System.out.println("Error: Invalid amount entered. Please enter a valid number.");
         } catch (InsufficientFundsOnATMException ex) {
             System.out.println("Error: Insufficient funds on ATM.");
-            selectErrorAction(scanner);
+            showSelectionInErrorCase(scanner);
         } catch (InsufficientFundsOnAccountException ex) {
             System.out.println("Error: Insufficient funds on account.");
-            selectErrorAction(scanner);
+            showSelectionInErrorCase(scanner);
         }
     }
 
@@ -138,14 +138,14 @@ public class ATMConsole {
             System.out.println("Deposit successful.");
         } catch (NumberFormatException ex) {
             System.out.println("Error: Invalid amount entered. Please enter a valid number.");
-            selectErrorAction(scanner);
+            showSelectionInErrorCase(scanner);
         } catch (AccountLimitExceededException ex) {
             System.out.println("Error: Account limit exceeded.");
-            selectErrorAction(scanner);
+            showSelectionInErrorCase(scanner);
         }
     }
 
-    private void selectErrorAction(Scanner scanner) {
+    private void showSelectionInErrorCase(Scanner scanner) {
         System.out.println("Enter choice:");
         System.out.println("1.Back to main menu");
         System.out.println("2.Exit");
