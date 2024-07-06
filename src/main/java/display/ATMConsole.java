@@ -17,25 +17,23 @@ public class ATMConsole {
     public void startATM() {
         try (Scanner scanner = new Scanner(System.in)) {
             do {
-                if (!authenticateCard(scanner)) {
+                if (!enterCardNumber(scanner)) {
                     continue;
                 }
-                if (!authenticatePin(scanner)) {
+                if (!enterPinCode(scanner)) {
                     continue;
                 }
                 showMainMenu(scanner);
-                break;
             } while (true);
-
         } catch (Exception ex) {
-            System.out.println("Something went wrong: " + ex.getMessage());
+            System.out.println("Something went wrong.");
         }
     }
 
-    private boolean authenticateCard(Scanner scanner) {
+    private boolean enterCardNumber(Scanner scanner) {
         try {
             System.out.println("Enter card number: ");
-            String cardNumber = scanner.nextLine();
+            String cardNumber = scanner.next();
             atmHandler.checkCardNumber(cardNumber);
             System.out.println("You have entered a valid card number.");
             return true;
@@ -47,17 +45,16 @@ public class ATMConsole {
             System.out.println("Card number not found.");
         } catch (AccountBlockedException ex) {
             System.out.println("Account blocked.");
-            return false;
         } catch (Exception ex) {
             System.out.println("Something went wrong.");
         }
         return false;
     }
 
-    private boolean authenticatePin(Scanner scanner) {
+    private boolean enterPinCode(Scanner scanner) {
         do {
             System.out.println("Enter pin code: ");
-            String pinCode = scanner.nextLine();
+            String pinCode = scanner.next();
             try {
                 atmHandler.checkCardPinCode(pinCode);
                 System.out.println("You have entered a valid pin code.");
@@ -97,7 +94,7 @@ public class ATMConsole {
                     break;
                 case 4:
                     System.out.println("Exiting... Thank you for using our ATM.");
-                    startATM();
+                    break;
                 default:
                     System.out.println("Invalid option. Please try again.");
             }
@@ -123,10 +120,8 @@ public class ATMConsole {
             System.out.println("Error: Invalid amount entered. Please enter a valid number.");
         } catch (InsufficientFundsOnATMException ex) {
             System.out.println("Error: Insufficient funds on ATM.");
-            showSelectionInErrorCase(scanner);
         } catch (InsufficientFundsOnAccountException ex) {
             System.out.println("Error: Insufficient funds on account.");
-            showSelectionInErrorCase(scanner);
         }
     }
 
@@ -138,27 +133,8 @@ public class ATMConsole {
             System.out.println("Deposit successful.");
         } catch (NumberFormatException ex) {
             System.out.println("Error: Invalid amount entered. Please enter a valid number.");
-            showSelectionInErrorCase(scanner);
         } catch (AccountLimitExceededException ex) {
             System.out.println("Error: Account limit exceeded.");
-            showSelectionInErrorCase(scanner);
-        }
-    }
-
-    private void showSelectionInErrorCase(Scanner scanner) {
-        System.out.println("Enter choice:");
-        System.out.println("1.Back to main menu");
-        System.out.println("2.Exit");
-
-        int choice = scanner.nextInt();
-
-        switch (choice) {
-            case 1:
-                break;
-            case 2:
-                startATM();
-            default:
-                System.out.println("Invalid option. Please try again.");
         }
     }
 }
